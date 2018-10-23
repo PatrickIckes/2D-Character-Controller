@@ -9,6 +9,13 @@ public class CharacterControllerScript : MonoBehaviour {
     bool facingRight = true;
 
     Animator anim;
+
+    bool grounded = false;
+    public Transform groundCheck;
+    float groundRadius = 0.2f;
+    public LayerMask whatIsGround;
+    public float jumpForce = 700;
+
     Rigidbody2D rigidbody2d = new Rigidbody2D();
 
 	void Start ()
@@ -24,6 +31,12 @@ public class CharacterControllerScript : MonoBehaviour {
 
     void FixedUpdate ()
     {
+        grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
+        anim.SetBool("Ground", grounded);
+        anim.SetFloat("vSpeed", rigidbody2d.velocity.y);
+
+
+
 		float move = Input.GetAxis("Horizontal");
 
         anim.SetFloat("Speed", Mathf.Abs(move));
@@ -35,6 +48,14 @@ public class CharacterControllerScript : MonoBehaviour {
         else if (move < 0 && facingRight)
             Flip();
 	}
+    private void Update()
+    {
+        if(grounded && Input.GetKeyDown(KeyCode.Space))
+        {
+            anim.SetBool("Ground", false);
+            rigidbody2d.AddForce(new Vector2(0, jumpForce));
+        }
+    }
 
     void Flip()
     {
